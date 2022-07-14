@@ -1,9 +1,9 @@
 Config = {}
 
 Config.vehicleList = {
-    { name = "BMX", model = "bmx", price = 10},
-    { name = "Faggio", model = "faggio", price = 100 },
-    { name = "Blista", model = "blista", price = 500 },
+    { name = "BMX", model = "bmx", price = 10, needLicense = false},
+    { name = "Faggio", model = "faggio", price = 100, needLicense = true },
+    { name = "Blista", model = "blista", price = 500 , needLicense = true},
 }
 
 Config.spawns = {
