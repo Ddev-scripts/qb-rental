@@ -4,12 +4,21 @@ RegisterServerEvent('qb-rental:attemptPurchase')
 AddEventHandler('qb-rental:attemptPurchase', function(car, price)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    local cash = Player.PlayerData.money.cash
-    if cash >= price then
-        TriggerClientEvent('qb-rental:vehiclespawn', source, car, price)
+
+    local driverLicense = Player.PlayerData.metadata["licences"]["driver"]
+
+    if driverLicense then
+        local cash = Player.PlayerData.money.cash
+        if cash >= price then
+            TriggerClientEvent('qb-rental:vehiclespawn', source, car, price)
+        else
+            TriggerClientEvent('qb-rental:attemptvehiclespawnfail', source)
+        end
     else
-        TriggerClientEvent('qb-rental:attemptvehiclespawnfail', source)
+        TriggerClientEvent('qb-rental:noDriverLicense', source)
     end
+
+
 end)
 
 RegisterServerEvent('qb-rental:purchase')
