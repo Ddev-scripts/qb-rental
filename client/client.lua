@@ -118,7 +118,10 @@ AddEventHandler("qb-rental:attemptvehiclespawnfail", function()
     QBCore.Functions.Notify("Pas assez d'argent.", "error")
 end)
 
-local PlayerName = nil
+RegisterNetEvent("qb-rental:noDriverLicense")
+AddEventHandler("qb-rental:noDriverLicense", function()
+    QBCore.Functions.Notify("Vous n'avez pas la license nécéssaire pour pouvoir louer ce véhicule.", "error")
+end)
 
 RegisterNetEvent("qb-rental:giverentalpaperClient")
 AddEventHandler("qb-rental:giverentalpaperClient", function(model, plate, name)
