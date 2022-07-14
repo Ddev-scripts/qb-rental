@@ -4,7 +4,7 @@ Simple vehicle rental system for QB-CORE.
 
 This system is inspired by [nc-rental](https://github.com/NaorNC/nc-rental)
 
-However this resource has no dependencies except QB-CORE.
+However this resource has no dependencies except QB-CORE and PolyZone.
 
 ## Installation
 
