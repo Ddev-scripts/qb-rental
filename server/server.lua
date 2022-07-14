@@ -27,7 +27,7 @@ AddEventHandler('qb-rental:purchase', function(car, price)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     Player.Functions.RemoveMoney("cash", price, "rentals")
-    TriggerClientEvent('QBCore:Notify', src, "Vous avez loué un(e) " .. car .. " pour $" .. price .. ", Pensez à rendre ce véhicule pour récupérer 50% du prix du véhicule.", "success")
+    TriggerClientEvent('QBCore:Notify', src, Config.translations[Config.locale].info_back, "success")
 end)
 
 RegisterServerEvent('qb-rental:giverentalpaperServer')
@@ -47,9 +47,9 @@ AddEventHandler('qb-rental:server:payreturn', function(model)
     local Player = QBCore.Functions.GetPlayer(source)
     for k, v in pairs(Config.vehicleList) do
         if string.lower(v.model) == model then
-            local payment = v.price / 2
-            Player.Functions.AddMoney("cash", payment, "rental-return")
-            TriggerClientEvent('QBCore:Notify', src, "Vous avez rendu le véhicule, et vous avez récupéré $" .. payment, "success")
+            local price = v.price / 2
+            Player.Functions.AddMoney("cash", price, "rental-return")
+            TriggerClientEvent('QBCore:Notify', src, Config.translations[Config.locale].success_back .. price, "success")
         end
     end
 end)
