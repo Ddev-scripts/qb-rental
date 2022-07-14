@@ -92,12 +92,12 @@ CreateThread(function()
                 {
                     event = "qb-rental:vehiclelist",
                     icon = "fas fa-circle",
-                    label = "Louer un véhicule",
+                    label = Config.translations[Config.locale].rent,
                 },
                 {
                     event = "qb-rental:returnvehicle",
                     icon = "fas fa-circle",
-                    label = "Rendre le véhicule (Récupérer 50% du prix de la location)",
+                    label =  Config.translations[Config.locale].back,
                 },
             },
             distance = 3.5
@@ -110,7 +110,7 @@ end)
 
 RegisterNetEvent("qb-rental:attemptvehiclespawn")
 AddEventHandler("qb-rental:attemptvehiclespawn", function(vehicle)
-    TriggerServerEvent("qb-rental:attemptPurchase", vehicle.id, vehicle.price)
+    TriggerServerEvent("qb-rental:attemptPurchase", vehicle.id, vehicle.price, vehicle.needLicense)
 end)
 
 RegisterNetEvent("qb-rental:attemptvehiclespawnfail")
@@ -120,7 +120,7 @@ end)
 
 RegisterNetEvent("qb-rental:noDriverLicense")
 AddEventHandler("qb-rental:noDriverLicense", function()
-    QBCore.Functions.Notify("Vous n'avez pas la license nécéssaire pour pouvoir louer ce véhicule.", "error")
+    QBCore.Functions.Notify(Config.translations[Config.locale].error_no_license, "error")
 end)
 
 RegisterNetEvent("qb-rental:giverentalpaperClient")
@@ -138,7 +138,7 @@ AddEventHandler("qb-rental:returnvehicle", function()
     if car ~= 0 then
         local plate = GetVehicleNumberPlateText(car)
         local vehname = string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(car)))
-        if string.find(tostring(plate), "NC") then
+        if string.find(tostring(plate), "RT") then
             QBCore.Functions.TriggerCallback('qb-rental:server:hasrentalpapers', function(HasItem)
                 if HasItem then
                     TriggerServerEvent("QBCore:Server:RemoveItem", "rentalpapers", 1)
@@ -146,14 +146,14 @@ AddEventHandler("qb-rental:returnvehicle", function()
                     DeleteVehicle(car)
                     DeleteEntity(car)
                 else
-                    QBCore.Functions.Notify("Je ne peux pas prendre un véhicule sans ses papiers.", "error")
+                    QBCore.Functions.Notify(Config.translations[Config.locale].error_no_papers, "error")
                 end
             end)
         else
-            QBCore.Functions.Notify("Ce n'est pas un véhicule loué.", "error")
+            QBCore.Functions.Notify(Config.translations[Config.locale].error_not_a_rent, "error")
         end
     else
-        QBCore.Functions.Notify("Je ne vois aucun véhicule loué, assurez-vous qu'il se trouve à proximité.", "error")
+        QBCore.Functions.Notify(Config.translations[Config.locale].error_to_far, "error")
     end
 end)
 
@@ -165,7 +165,7 @@ AddEventHandler("qb-rental:vehiclespawn", function(car, price, cb)
         local CanSpawn = IsSpawnPointClear(coords, 2.0)
         if CanSpawn then
             QBCore.Functions.SpawnVehicle(car, function(veh)
-                SetVehicleNumberPlateText(veh, "NC" .. tostring(math.random(1000, 9999)))
+                SetVehicleNumberPlateText(veh, "RT" .. tostring(math.random(1000, 9999)))
                 exports['LegacyFuel']:SetFuel(veh, 100.0)
                 SetEntityHeading(veh, Config.spawns[SpawnPoint].w)
                 TaskWarpPedIntoVehicle(PlayerPedId(), veh, -1)
@@ -175,10 +175,10 @@ AddEventHandler("qb-rental:vehiclespawn", function(car, price, cb)
                 TriggerServerEvent("qb-rental:purchase", car, price)
             end, coords, true)
         else
-            QBCore.Functions.Notify('Tous les emplacements de spawn sont en cours d\'utilisation', "error")
+            QBCore.Functions.Notify(Config.translations[Config.locale].error_all_emplacement_used, "error")
         end
     else
-        QBCore.Functions.Notify('Tous les emplacements de spawn sont en cours d\'utilisation', 'error')
+        QBCore.Functions.Notify(Config.translations[Config.locale].error_all_emplacement_used, 'error')
         return
     end
 end)
