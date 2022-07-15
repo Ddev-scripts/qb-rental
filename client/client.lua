@@ -115,7 +115,7 @@ end)
 
 RegisterNetEvent("qb-rental:attemptvehiclespawnfail")
 AddEventHandler("qb-rental:attemptvehiclespawnfail", function()
-    QBCore.Functions.Notify("Pas assez d'argent.", "error")
+    QBCore.Functions.Notify( Config.translations[Config.locale].error_no_money, "error")
 end)
 
 RegisterNetEvent("qb-rental:noDriverLicense")
