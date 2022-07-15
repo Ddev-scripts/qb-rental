@@ -26,8 +26,7 @@ Config.translations = {
         error_not_a_rent = 'This is not a rented vehicle.',
         error_to_far = 'I don\'t see any rented vehicles, please make sure they are nearby',
         error_all_emplacement_used = 'All spawn locations are in use',
-    }
-    
+    },
     fr = {
         rent = 'Louer un véhicule',
         back = 'Rendre le véhicule (Récupérer 50% du prix de la location)',
