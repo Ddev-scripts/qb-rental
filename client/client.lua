@@ -193,7 +193,7 @@ AddEventHandler("qb-rental:vehiclespawn", function(car, price,garage, cb)
                 TriggerEvent("vehiclekeys:client:SetOwner", QBCore.Functions.GetPlate(veh))
                 SetVehicleEngineOn(veh, true, true)
                 TaskWarpPedIntoVehicle(PlayerPedId(), veh, -1)
-                TriggerServerEvent("qb-rental:purchase", car, price)
+                TriggerServerEvent("qb-rental:purchase", price)
                 TriggerServerEvent("qb-rental:giverentalpaperServer",plate)
             end, coords, true)
         else
