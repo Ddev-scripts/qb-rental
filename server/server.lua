@@ -31,7 +31,7 @@ AddEventHandler('qb-rental:purchase', function(car, price)
 end)
 
 RegisterServerEvent('qb-rental:giverentalpaperServer')
-AddEventHandler('qb-rental:giverentalpaperServer', function(model, plateText)
+AddEventHandler('qb-rental:giverentalpaperServer', function(plateText)
     local src = source
     local PlayerData = QBCore.Functions.GetPlayer(src)
     local info = {
