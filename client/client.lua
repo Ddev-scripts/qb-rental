@@ -26,10 +26,19 @@ local function IsSpawnPointClear(coords, maxDistance)
     return #GetVehiclesInArea(coords, maxDistance) == 0
 end
 
-local function getVehicleSpawnPoint()
+local function getVehicleSpawnPoint(garage)
+
+    local spawns = nil
+
+    --get garage
+    for k, v in pairs(Config.locations) do
+        if v.id == garage then spawns = v.spawns break end
+    end
+
+
     local near = nil
     local distance = 10000
-    for k, v in pairs(Config.spawns) do
+    for k, v in pairs(spawns) do
         if IsSpawnPointClear(vector3(v.x, v.y, v.z), 2.5) then
             local ped = PlayerPedId()
             local pos = GetEntityCoords(ped)
@@ -40,23 +49,28 @@ local function getVehicleSpawnPoint()
             end
         end
     end
+
     return near
 end
 
 CreateThread(function()
-    local rentBlip = AddBlipForCoord(-1017.93, -2703.8, 13.76, 156.15)
-    SetBlipSprite(rentBlip, 227)
-    SetBlipScale(rentBlip, 0.7)
-    SetBlipDisplay(rentBlip, 4)
-    SetBlipColour(rentBlip, 2)
-    SetBlipAsShortRange(rentBlip, true)
-    BeginTextCommandSetBlipName("STRING")
-    AddTextComponentString('Location de véhicules')
-    EndTextCommandSetBlipName(rentBlip)
+    for k, v in pairs(Config.locations) do
+        local rentBlip = AddBlipForCoord(Config.locations[k].spawnPed)
+        SetBlipSprite(rentBlip, 227)
+        SetBlipScale(rentBlip, 0.7)
+        SetBlipDisplay(rentBlip, 4)
+        SetBlipColour(rentBlip, 2)
+        SetBlipAsShortRange(rentBlip, true)
+        BeginTextCommandSetBlipName("STRING")
+        AddTextComponentString('Location de véhicules')
+        EndTextCommandSetBlipName(rentBlip)
+    end
+
 end)
 
 RegisterNetEvent("qb-rental:vehiclelist")
-AddEventHandler("qb-rental:vehiclelist", function()
+AddEventHandler("qb-rental:vehiclelist", function(data)
+    local garage = data.garage
     local vehicles = {}
     for i = 1, #Config.vehicleList do
         table.insert(vehicles, {
@@ -68,6 +82,8 @@ AddEventHandler("qb-rental:vehiclelist", function()
                 args = {
                     id = Config.vehicleList[i].model,
                     price = Config.vehicleList[i].price,
+                    needLicense = Config.vehicleList[i].needLicense,
+                    garage = garage
                 }
             }
         })
@@ -76,41 +92,44 @@ AddEventHandler("qb-rental:vehiclelist", function()
 end)
 
 CreateThread(function()
-    exports['qb-target']:SpawnPed({
-        model = 'a_m_m_indian_01',
-        coords = vector4(-1017.93, -2703.8, 13.76, 156.15),
-        minusOne = true,
-        freeze = true,
-        invincible = true,
-        blockevents = true,
-        animDict = 'abigail_mcs_1_concat-0',
-        anim = 'csb_abigail_dual-0',
-        flag = 1,
-        scenario = 'WORLD_HUMAN_AA_COFFEE',
-        target = {
-            options = {
-                {
-                    event = "qb-rental:vehiclelist",
-                    icon = "fas fa-circle",
-                    label = Config.translations[Config.locale].rent,
+    for k, v in pairs(Config.locations) do
+        exports['qb-target']:SpawnPed({
+            model = 'a_m_m_indian_01',
+            coords = Config.locations[k].spawnPed,
+            minusOne = true,
+            freeze = true,
+            invincible = true,
+            blockevents = true,
+            animDict = 'abigail_mcs_1_concat-0',
+            anim = 'csb_abigail_dual-0',
+            flag = 1,
+            scenario = 'WORLD_HUMAN_AA_COFFEE',
+            target = {
+                options = {
+                    {
+                        event = "qb-rental:vehiclelist",
+                        icon = "fas fa-circle",
+                        label = Config.translations[Config.locale].rent,
+                        garage = Config.locations[k].id
+                    },
+                    {
+                        event = "qb-rental:returnvehicle",
+                        icon = "fas fa-circle",
+                        label =  Config.translations[Config.locale].back,
+                    },
                 },
-                {
-                    event = "qb-rental:returnvehicle",
-                    icon = "fas fa-circle",
-                    label =  Config.translations[Config.locale].back,
-                },
+                distance = 3.5
             },
-            distance = 3.5
-        },
-        spawnNow = true,
-        currentpednumber = 0,
-    })
+            spawnNow = true,
+            currentpednumber = 0,
+        })
+    end
 
 end)
 
 RegisterNetEvent("qb-rental:attemptvehiclespawn")
-AddEventHandler("qb-rental:attemptvehiclespawn", function(vehicle)
-    TriggerServerEvent("qb-rental:attemptPurchase", vehicle.id, vehicle.price, vehicle.needLicense)
+AddEventHandler("qb-rental:attemptvehiclespawn", function(args)
+    TriggerServerEvent("qb-rental:attemptPurchase", args.id, args.price, args.needLicense, args.garage)
 end)
 
 RegisterNetEvent("qb-rental:attemptvehiclespawnfail")
@@ -158,16 +177,26 @@ AddEventHandler("qb-rental:returnvehicle", function()
 end)
 
 RegisterNetEvent("qb-rental:vehiclespawn")
-AddEventHandler("qb-rental:vehiclespawn", function(car, price, cb)
-    local SpawnPoint = getVehicleSpawnPoint()
+AddEventHandler("qb-rental:vehiclespawn", function(car, price,garage, cb)
+    local SpawnPoint = getVehicleSpawnPoint(garage)
+    local spawns = nil
+
+    --get garage
+    for k, v in pairs(Config.locations) do
+        if v.id == garage then
+            spawns = v.spawns
+            break
+        end
+    end
+
     if SpawnPoint then
-        local coords = vector3(Config.spawns[SpawnPoint].x, Config.spawns[SpawnPoint].y, Config.spawns[SpawnPoint].z)
+        local coords = vector3(spawns[SpawnPoint].x, spawns[SpawnPoint].y, spawns[SpawnPoint].z)
         local CanSpawn = IsSpawnPointClear(coords, 2.0)
         if CanSpawn then
             QBCore.Functions.SpawnVehicle(car, function(veh)
                 SetVehicleNumberPlateText(veh, "RT" .. tostring(math.random(1000, 9999)))
                 exports['LegacyFuel']:SetFuel(veh, 100.0)
-                SetEntityHeading(veh, Config.spawns[SpawnPoint].w)
+                SetEntityHeading(veh, spawns[SpawnPoint].w)
                 TaskWarpPedIntoVehicle(PlayerPedId(), veh, -1)
                 TriggerEvent("vehiclekeys:client:SetOwner", QBCore.Functions.GetPlate(veh))
                 SetVehicleEngineOn(veh, true, true)
