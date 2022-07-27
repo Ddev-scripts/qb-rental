@@ -142,15 +142,6 @@ AddEventHandler("qb-rental:noDriverLicense", function()
     QBCore.Functions.Notify(Config.translations[Config.locale].error_no_license, "error")
 end)
 
-RegisterNetEvent("qb-rental:giverentalpaperClient")
-AddEventHandler("qb-rental:giverentalpaperClient", function(model, plate, name)
-
-    local info = {
-        data = "Model : " .. tostring(model) .. " | Plate : " .. tostring(plate) .. ""
-    }
-    TriggerServerEvent('QBCore:Server:AddItem', "rentalpapers", 1, info)
-end)
-
 RegisterNetEvent("qb-rental:returnvehicle")
 AddEventHandler("qb-rental:returnvehicle", function()
     local car = GetVehiclePedIsIn(PlayerPedId(), true)
@@ -194,7 +185,8 @@ AddEventHandler("qb-rental:vehiclespawn", function(car, price,garage, cb)
         local CanSpawn = IsSpawnPointClear(coords, 2.0)
         if CanSpawn then
             QBCore.Functions.SpawnVehicle(car, function(veh)
-                SetVehicleNumberPlateText(veh, "RT" .. tostring(math.random(1000, 9999)))
+                local plate = "RT" .. tostring(math.random(1000, 9999))
+                SetVehicleNumberPlateText(veh, plate)
                 exports['LegacyFuel']:SetFuel(veh, 100.0)
                 SetEntityHeading(veh, spawns[SpawnPoint].w)
                 TaskWarpPedIntoVehicle(PlayerPedId(), veh, -1)
@@ -202,6 +194,7 @@ AddEventHandler("qb-rental:vehiclespawn", function(car, price,garage, cb)
                 SetVehicleEngineOn(veh, true, true)
                 TaskWarpPedIntoVehicle(PlayerPedId(), veh, -1)
                 TriggerServerEvent("qb-rental:purchase", car, price)
+                TriggerServerEvent("qb-rental:giverentalpaperServer",plate)
             end, coords, true)
         else
             QBCore.Functions.Notify(Config.translations[Config.locale].error_all_emplacement_used, "error")
