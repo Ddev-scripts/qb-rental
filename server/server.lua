@@ -56,6 +56,7 @@ QBCore.Functions.CreateCallback('qb-rental:server:hasrentalpapers', function(sou
     local Player = QBCore.Functions.GetPlayer(source)
     local Item = Player.Functions.GetItemByName("rentalpapers")
     if Item ~= nil then
+        Player.Functions.RemoveItem('rentalpapers', 1)
         cb(true)
     else
         cb(false)
