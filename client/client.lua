@@ -151,7 +151,6 @@ AddEventHandler("qb-rental:returnvehicle", function()
         if string.find(tostring(plate), "RT") then
             QBCore.Functions.TriggerCallback('qb-rental:server:hasrentalpapers', function(HasItem)
                 if HasItem then
-                    TriggerServerEvent("QBCore:Server:RemoveItem", "rentalpapers", 1)
                     TriggerServerEvent('qb-rental:server:payreturn', vehname)
                     DeleteVehicle(car)
                     DeleteEntity(car)
